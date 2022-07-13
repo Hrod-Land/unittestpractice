@@ -32,11 +32,9 @@ public class AuthenticationTest {
             "d_user,d_userP,RD,user authenticated successfully with permission: [RD]",
             "x_user,x_userP,No Permission for this user,user authenticated successfully with permission: [No Permission for this user]"
     })
-      public void verifySuccessfulLogin(String user, String pass, String permission, String expected_result){
+    public void verifySuccessfulLogin(String user, String pass, String permission, String expected_result){
 
-        //Mock credentials
         Mockito.when(credentialsServiceMock.isValidCredential(user,pass)).thenReturn(true);
-        //Mock Permission
         Mockito.when(permissionService.getPermission(user)).thenReturn(permission);
 
         authentication.setCredentialsService(credentialsServiceMock);
@@ -44,7 +42,24 @@ public class AuthenticationTest {
 
         Assertions.assertEquals(expected_result, authentication.login(user, pass),"Error....!!!");
 
-//        Mockito.verify(credentialsServiceMock).isValidCredential("admin","admin");
-//        Mockito.verify(permissionService).getPermission("admin");
+        Mockito.verify(credentialsServiceMock).isValidCredential(user,pass);
+        Mockito.verify(permissionService).getPermission(user);
+    }
+
+    @ParameterizedTest
+    @CsvSource({ //All user/pass that ends with X is the wrong one
+            "adminX,admin,user or password incorrect",
+            "admin,adminX,user or password incorrect",
+            "adminX,adminX,user or password incorrect",
+    })
+    public void verifyUnsuccessfulLogin(String user, String pass, String expected_result){
+
+        Mockito.when(credentialsServiceMock.isValidCredential(user,pass)).thenReturn(false);
+
+        authentication.setCredentialsService(credentialsServiceMock);
+
+        Assertions.assertEquals(expected_result, authentication.login(user, pass),"Error....!!!");
+
+        Mockito.verify(credentialsServiceMock).isValidCredential(user,pass);
     }
 }
