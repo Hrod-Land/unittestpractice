@@ -18,6 +18,7 @@ public class AuthenticationTest {
 
     @BeforeEach
     public void setup (){
+
         authentication = new Authentication();
         credentialsServiceMock =  Mockito.mock(CredentialsService.class);
         permissionService = Mockito.mock(PermissionService.class);
