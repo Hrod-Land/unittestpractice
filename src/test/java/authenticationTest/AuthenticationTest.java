@@ -21,6 +21,9 @@ public class AuthenticationTest {
         authentication = new Authentication();
         credentialsServiceMock =  Mockito.mock(CredentialsService.class);
         permissionService = Mockito.mock(PermissionService.class);
+
+        authentication.setCredentialsService(credentialsServiceMock);
+        authentication.setPermissionService(permissionService);
     }
 
     @ParameterizedTest
@@ -37,9 +40,6 @@ public class AuthenticationTest {
         Mockito.when(credentialsServiceMock.isValidCredential(user,pass)).thenReturn(true);
         Mockito.when(permissionService.getPermission(user)).thenReturn(permission);
 
-        authentication.setCredentialsService(credentialsServiceMock);
-        authentication.setPermissionService(permissionService);
-
         Assertions.assertEquals(expected_result, authentication.login(user, pass),"Error....!!!");
 
         Mockito.verify(credentialsServiceMock).isValidCredential(user,pass);
@@ -55,8 +55,6 @@ public class AuthenticationTest {
     public void verifyUnsuccessfulLogin(String user, String pass, String expected_result){
 
         Mockito.when(credentialsServiceMock.isValidCredential(user,pass)).thenReturn(false);
-
-        authentication.setCredentialsService(credentialsServiceMock);
 
         Assertions.assertEquals(expected_result, authentication.login(user, pass),"Error....!!!");
 
