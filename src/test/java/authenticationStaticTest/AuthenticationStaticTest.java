@@ -19,7 +19,6 @@ public class AuthenticationStaticTest {
         authentication = new Authentication();
     }
 
-
     @ParameterizedTest
     @CsvSource({
             "admin,admin,CRUD,user authenticated successfully with permission: [CRUD]",
@@ -43,7 +42,6 @@ public class AuthenticationStaticTest {
         permissionStaticServiceMocked.close();
 
         Assertions.assertEquals(expected_result, actual_result, "ERROR...!!!");
-
     }
 
     @ParameterizedTest
