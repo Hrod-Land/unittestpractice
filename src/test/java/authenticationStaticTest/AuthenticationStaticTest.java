@@ -1,16 +1,24 @@
 package authenticationStaticTest;
-
 import authenticationStatic.Authentication;
 import authenticationStatic.CredentialsStaticService;
 import authenticationStatic.PermissionStaticService;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 public class AuthenticationStaticTest {
+
+    Authentication authentication;
+
+    @BeforeEach
+    public void setup (){
+
+        authentication = new Authentication();
+    }
+
 
     @ParameterizedTest
     @CsvSource({
@@ -22,38 +30,34 @@ public class AuthenticationStaticTest {
             "x_user,x_userP,No Permission for this user,user authenticated successfully with permission: [No Permission for this user]"
     })
     public void verifySuccessfulLogin(String user, String pass, String permission, String expected_result){
+
         MockedStatic<CredentialsStaticService> credentialsStaticServiceMocked = Mockito.mockStatic(CredentialsStaticService.class);
         credentialsStaticServiceMocked.when(()->CredentialsStaticService.isValidCredential(user, pass)).thenReturn(true);
 
         MockedStatic<PermissionStaticService> permissionStaticServiceMocked = Mockito.mockStatic(PermissionStaticService.class);
         permissionStaticServiceMocked.when(()->PermissionStaticService.getPermission(user)).thenReturn(permission);
 
-        Authentication authentication = new Authentication();
-
         String actual_result = authentication.login(user,pass);
-
-        Assertions.assertEquals(expected_result, actual_result, "ERROR...!!!");
 
         credentialsStaticServiceMocked.close();
         permissionStaticServiceMocked.close();
+
+        Assertions.assertEquals(expected_result, actual_result, "ERROR...!!!");
 
     }
 
     @ParameterizedTest
     @CsvSource({ //All user/pass that ends with X is the wrong one
-            "adminX,admin,user or password incorrectl",
+            "adminX,admin,user or password incorrect",
             "admin,adminX,user or password incorrect",
             "adminX,adminX,user or password incorrect"
     })
     public void verifyUnsuccessfulLogin(String user, String pass, String expected_result){
+
         MockedStatic<CredentialsStaticService> credentialsStaticServiceMocked = Mockito.mockStatic(CredentialsStaticService.class);
         credentialsStaticServiceMocked.when(()->CredentialsStaticService.isValidCredential(user, pass)).thenReturn(false);
-
-        Authentication authentication = new Authentication();
-
         credentialsStaticServiceMocked.close();
-        Assertions.assertEquals(expected_result, authentication.login(user,pass), "ERROR...!!!");
 
-
+        Assertions.assertEquals(expected_result, authentication.login(user,pass), "FAILED: Take attention...!!!");
     }
 }
