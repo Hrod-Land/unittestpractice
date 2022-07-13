@@ -38,4 +38,22 @@ public class AuthenticationStaticTest {
         permissionStaticServiceMocked.close();
 
     }
+
+    @ParameterizedTest
+    @CsvSource({ //All user/pass that ends with X is the wrong one
+            "adminX,admin,user or password incorrectl",
+            "admin,adminX,user or password incorrect",
+            "adminX,adminX,user or password incorrect"
+    })
+    public void verifyUnsuccessfulLogin(String user, String pass, String expected_result){
+        MockedStatic<CredentialsStaticService> credentialsStaticServiceMocked = Mockito.mockStatic(CredentialsStaticService.class);
+        credentialsStaticServiceMocked.when(()->CredentialsStaticService.isValidCredential(user, pass)).thenReturn(false);
+
+        Authentication authentication = new Authentication();
+
+        credentialsStaticServiceMocked.close();
+        Assertions.assertEquals(expected_result, authentication.login(user,pass), "ERROR...!!!");
+
+
+    }
 }
